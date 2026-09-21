@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vědecký portál</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 50px;
+            max-width: 900px;
+            width: 100%;
+        }
+
+        h1 {
+            text-align: center;
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 36px;
+        }
+
+        .subtitle {
+            text-align: center;
+            color: #666;
+            margin-bottom: 50px;
+            font-size: 16px;
+        }
+
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .menu-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px;
+            border-radius: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            text-decoration: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 200px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .menu-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+        }
+
+        .menu-card.calc {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .menu-card.calc:hover {
+            background: linear-gradient(135deg, #5568d3 0%, #6b3fa0 100%);
+        }
+
+        .menu-card.converter {
+            background: linear-gradient(135deg, #f093fb 0%, #f5576c 100%);
+        }
+
+        .menu-card.converter:hover {
+            background: linear-gradient(135deg, #e080e8 0%, #e24455 100%);
+        }
+
+        .menu-card.periodic {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+        }
+
+        .menu-card.periodic:hover {
+            background: linear-gradient(135deg, #3d9cec 0%, #00e0ec 100%);
+        }
+
+        .menu-card.formulas {
+            background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+        }
+
+        .menu-card.formulas:hover {
+            background: linear-gradient(135deg, #38d66a 0%, #2de8c6 100%);
+        }
+
+        .menu-card.units {
+            background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+        }
+
+        .menu-card.units:hover {
+            background: linear-gradient(135deg, #e95a89 0%, #ecd02f 100%);
+        }
+
+        .menu-card.notes {
+            background: linear-gradient(135deg, #30cfd0 0%, #330867 100%);
+        }
+
+        .menu-card.notes:hover {
+            background: linear-gradient(135deg, #1ebfc0 0%, #220656 100%);
+        }
+
+        .menu-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .menu-title {
+            font-size: 22px;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+
+        .menu-description {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+
+        .footer {
+            text-align: center;
+            color: #666;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+
+        /* Modal styly */
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow-y: auto;
+        }
+
+        .modal.show {
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding-top: 20px;
+        }
+
+        .modal-content {
+            background-color: white;
+            border-radius: 15px;
+            width: 90%;
+            max-width: 900px;
+            max-height: 85vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 1001;
+            border-radius: 15px 15px 0 0;
+        }
+
+        .modal-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            color: white;
+            font-size: 28px;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.4);
+        }
+
+        .modal-body {
+            padding: 30px;
+        }
+
+        /* Converter */
+        .converter-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .form-group {
+            display: grid;
+            gap: 10px;
+        }
+
+        .form-group label {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .form-group select,
+        .form-group input {
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .converter-result {
+            background: #f0f0f0;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: #667eea;
+        }
+
+        /* Periodic table */
+        .periodic-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(80px, 1fr));
+            gap: 8px;
+            margin-top: 20px;
+        }
+
+        .element {
+            background: #f0f0f0;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+        }
+
+        .element:hover {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+            transform: scale(1.05);
+        }
+
+        .element-number {
+            font-size: 10px;
+            color: #999;
+        }
+
+        .element-symbol {
+            font-size: 20px;
+            font-weight: bold;
+        }
+
+        .element-name {
+            font-size: 10px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+
+        th {
+            background: #f0f0f0;
+            padding: 12px;
+            text-align: left;
+            font-weight: bold;
+            border-bottom: 2px solid #667eea;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #eee;
+        }
+
+        tr:hover {
+            background: #f9f9f9;
+        }
+
+        .notes-area {
+            width: 100%;
+            min-height: 300px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+            resize: vertical;
+        }
+
+        .save-btn {
+            background: #48bb78;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: bold;
+            margin-top: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .save-btn:hover {
+            background: #38a169;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(72, 187, 120, 0.4);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔬 Vědecký portál</h1>
+        <p class="subtitle">Kalkulačka, konvertory, tabulky a více</p>
+
+        <div class="menu-grid">
+            <!-- Kalkulačka -->
+            <div class="menu-card calc" onclick="openCalculator()">
+                <div class="menu-icon">🧮</div>
+                <div class="menu-title">Kalkulačka</div>
+                <div class="menu-description">Vědecká a fyzikální výpočty</div>
+            </div>
+
+            <!-- Konvertor jednotek -->
+            <div class="menu-card converter" onclick="openConverter()">
+                <div class="menu-icon">🔄</div>
+                <div class="menu-title">Konvertor</div>
+                <div class="menu-description">Převody jednotek</div>
+            </div>
+
+            <!-- Periodická tabulka -->
+            <div class="menu-card periodic" onclick="openPeriodic()">
+                <div class="menu-icon">⚛️</div>
+                <div class="menu-title">Periodická tabulka</div>
+                <div class="menu-description">Prvky a jejich vlastnosti</div>
+            </div>
+
+            <!-- Fyzikální vzorce -->
+            <div class="menu-card formulas" onclick="openFormulas()">
+                <div class="menu-icon">∑</div>
+                <div class="menu-title">Vzorce</div>
+                <div class="menu-description">Fyzika, chemie, matematika</div>
+            </div>
+
+            <!-- Jednotky -->
+            <div class="menu-card units" onclick="openUnits()">
+                <div class="menu-icon">📏</div>
+                <div class="menu-title">Jednotky</div>
+                <div class="menu-description">Přehled jednotek SI</div>
+            </div>
+
+            <!-- Poznámky -->
+            <div class="menu-card notes" onclick="openNotes()">
+                <div class="menu-icon">📝</div>
+                <div class="menu-title">Poznámky</div>
+                <div class="menu-description">Tvoje vlastní poznámky</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>© 2024 Vědecký portál | Vytvořeno s ❤️</p>
+        </div>
+    </div>
+
+    <!-- Modal pro kalkulačku -->
+    <div id="calculatorModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🧮 Vědecká kalkulačka</h2>
+                <button class="close-btn" onclick="closeModal('calculatorModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <iframe src="kalkulacka.html" style="width: 100%; height: 600px; border: none; border-radius: 8px;"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pro konvertor -->
+    <div id="converterModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>🔄 Konvertor jednotek</h2>
+                <button class="close-btn" onclick="closeModal('converterModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="converter-form">
+                    <div class="form-group">
+                        <label>Typ konverze:</label>
+                        <select id="converterType" onchange="updateConverter()">
+                            <option value="length">Délka</option>
+                            <option value="mass">Hmotnost</option>
+                            <option value="temperature">Teplota</option>
+                            <option value="volume">Objem</option>
+                            <option value="speed">Rychlost</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Hodnota:</label>
+                        <input type="number" id="converterValue" placeholder="Zadej hodnotu" oninput="convertValue()">
+                    </div>
+
+                    <div class="form-group">
+                        <label>Z jednotky:</label>
+                        <select id="fromUnit" onchange="convertValue()">
+                            <option value="m">Metr (m)</option>
+                            <option value="km">Kilometr (km)</option>
+                            <option value="cm">Centimetr (cm)</option>
+                            <option value="mm">Milimetr (mm)</option>
+                            <option value="inch">Palec (in)</option>
+                            <option value="ft">Stopa (ft)</option>
+                            <option value="mile">Míle (mi)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label>Na jednotku:</label>
+                        <select id="toUnit" onchange="convertValue()">
+                            <option value="m">Metr (m)</option>
+                            <option value="km">Kilometr (km)</option>
+                            <option value="cm">Centimetr (cm)</option>
+                            <option value="mm">Milimetr (mm)</option>
+                            <option value="inch">Palec (in)</option>
+                            <option value="ft">Stopa (ft)</option>
+                            <option value="mile">Míle (mi)</option>
+                        </select>
+                    </div>
+
+                    <div class="converter-result" id="converterResult">0</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pro periodickou tabulku -->
+    <div id="periodicModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>⚛️ Periodická tabulka prvků</h2>
+                <button class="close-btn" onclick="closeModal('periodicModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="periodic-grid" id="periodicGrid"></div>
+                <div id="elementInfo" style="margin-top: 30px; padding: 20px; background: #f0f0f0; border-radius: 8px; display: none;">
+                    <h3 id="elementTitle"></h3>
+                    <p id="elementDetails"></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pro vzorce -->
+    <div id="formulasModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>∑ Fyzikální a chemické vzorce</h2>
+                <button class="close-btn" onclick="closeModal('formulasModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <h3>Fyzika</h3>
+                <table>
+                    <tr>
+                        <th>Veličina</th>
+                        <th>Vzorec</th>
+                        <th>Jednotka</th>
+                    </tr>
+                    <tr>
+                        <td>Síla</td>
+                        <td>F = m · a</td>
+                        <td>N (Newton)</td>
+                    </tr>
+                    <tr>
+                        <td>Práce</td>
+                        <td>W = F · s</td>
+                        <td>J (Joule)</td>
+                    </tr>
+                    <tr>
+                        <td>Výkon</td>
+                        <td>P = W / t</td>
+                        <td>W (Watt)</td>
+                    </tr>
+                    <tr>
+                        <td>Kinetická energie</td>
+                        <td>Ek = ½ m v²</td>
+                        <td>J (Joule)</td>
+                    </tr>
+                    <tr>
+                        <td>Potenciální energie</td>
+                        <td>Ep = m g h</td>
+                        <td>J (Joule)</td>
+                    </tr>
+                    <tr>
+                        <td>Tlak</td>
+                        <td>p = F / S</td>
+                        <td>Pa (Pascal)</td>
+                    </tr>
+                    <tr>
+                        <td>Rychlost</td>
+                        <td>v = s / t</td>
+                        <td>m/s</td>
+                    </tr>
+                    <tr>
+                        <td>Zrychlení</td>
+                        <td>a = Δv / Δt</td>
+                        <td>m/s²</td>
+                    </tr>
+                </table>
+
+                <h3 style="margin-top: 30px;">Chemie</h3>
+                <table>
+                    <tr>
+                        <th>Veličina</th>
+                        <th>Vzorec</th>
+                        <th>Jednotka</th>
+                    </tr>
+                    <tr>
+                        <td>Molární hmotnost</td>
+                        <td>M = m / n</td>
+                        <td>g/mol</td>
+                    </tr>
+                    <tr>
+                        <td>Molární koncentrace</td>
+                        <td>c = n / V</td>
+                        <td>mol/dm³</td>
+                    </tr>
+                    <tr>
+                        <td>pH</td>
+                        <td>pH = -log[H⁺]</td>
+                        <td>bezjednotková</td>
+                    </tr>
+                    <tr>
+                        <td>Hmotnostní procento</td>
+                        <td>w = (m₁/m) × 100%</td>
+                        <td>%</td>
+                    </tr>
+                </table>
+
+                <h3 style="margin-top: 30px;">Matematika</h3>
+                <table>
+                    <tr>
+                        <th>Veličina</th>
+                        <th>Vzorec</th>
+                    </tr>
+                    <tr>
+                        <td>Pythagorova věta</td>
+                        <td>c² = a² + b²</td>
+                    </tr>
+                    <tr>
+                        <td>Obsah kruhu</td>
+                        <td>S = π r²</td>
+                    </tr>
+                    <tr>
+                        <td>Obvod kruhu</td>
+                        <td>O = 2π r</td>
+                    </tr>
+                    <tr>
+                        <td>Objem koule</td>
+                        <td>V = (4/3) π r³</td>
+                    </tr>
+                    <tr>
+                        <td>Objem válce</td>
+                        <td>V = π r² h</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pro jednotky -->
+    <div id="unitsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📏 Jednotky SI</h2>
+                <button class="close-btn" onclick="closeModal('unitsModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <table>
+                    <tr>
+                        <th>Veličina</th>
+                        <th>Jednotka</th>
+                        <th>Symbol</th>
+                    </tr>
+                    <tr>
+                        <td>Délka</td>
+                        <td>Metr</td>
+                        <td>m</td>
+                    </tr>
+                    <tr>
+                        <td>Hmotnost</td>
+                        <td>Kilogram</td>
+                        <td>kg</td>
+                    </tr>
+                    <tr>
+                        <td>Čas</td>
+                        <td>Sekunda</td>
+                        <td>s</td>
+                    </tr>
+                    <tr>
+                        <td>Elektrický proud</td>
+                        <td>Ampér</td>
+                        <td>A</td>
+                    </tr>
+                    <tr>
+                        <td>Termodynamická teplota</td>
+                        <td>Kelvin</td>
+                        <td>K</td>
+                    </tr>
+                    <tr>
+                        <td>Látkové množství</td>
+                        <td>Mol</td>
+                        <td>mol</td>
+                    </tr>
+                    <tr>
+                        <td>Svítivost</td>
+                        <td>Kandela</td>
+                        <td>cd</td>
+                    </tr>
+                    <tr>
+                        <td>Síla</td>
+                        <td>Newton</td>
+                        <td>N</td>
+                    </tr>
+                    <tr>
+                        <td>Tlak</td>
+                        <td>Pascal</td>
+                        <td>Pa</td>
+                    </tr>
+                    <tr>
+                        <td>Energie</td>
+                        <td>Joule</td>
+                        <td>J</td>
+                    </tr>
+                    <tr>
+                        <td>Výkon</td>
+                        <td>Watt</td>
+                        <td>W</td>
+                    </tr>
+                    <tr>
+                        <td>Elektrické napětí</td>
+                        <td>Volt</td>
+                        <td>V</td>
+                    </tr>
+                    <tr>
+                        <td>Elektrický odpor</td>
+                        <td>Ohm</td>
+                        <td>Ω</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal pro poznámky -->
+    <div id="notesModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>📝 Tvoje poznámky</h2>
+                <button class="close-btn" onclick="closeModal('notesModal')">&times;</button>
+            </div>
+            <div class="modal-body">
+                <textarea class="notes-area" id="notesText" placeholder="Piš si sem své poznámky..."></textarea>
+                <button class="save-btn" onclick="saveNotes()">💾 Uložit poznámky</button>
+                <p style="margin-top: 10px; color: #999; font-size: 12px;">Poznámky se ukládají do tvého prohlížeče</p>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Otevírání a zavírání modalů
+        function openCalculator() {
+            document.getElementById('calculatorModal').classList.add('show');
+        }
+
+        function openConverter() {
+            document.getElementById('converterModal').classList.add('show');
+        }
+
+        function openPeriodic() {
+            document.getElementById('periodicModal').classList.add('show');
+            loadPeriodicTable();
+        }
+
+        function openFormulas() {
+            document.getElementById('formulasModal').classList.add('show');
+        }
+
+        function openUnits() {
+            document.getElementById('unitsModal').classList.add('show');
+        }
+
+        function openNotes() {
+            document.getElementById('notesModal').classList.add('show');
+            loadNotes();
+        }
+
+        function closeModal(modalId) {
+            document.getElementById(modalId).classList.remove('show');
+        }
+
+        // Zavření modalu kliknutím mimo
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal')) {
+                event.target.classList.remove('show');
+            }
+        }
+
+        // Konvertor jednotek
+        const conversions = {
+            length: {
+                m: 1,
+                km: 0.001,
+                cm: 100,
+                mm: 1000,
+                inch: 39.3701,
+                ft: 3.28084,
+                mile: 0.000621371
+            },
+            mass: {
+                kg: 1,
+                g: 1000,
+                mg: 1000000,
+                oz: 35.274,
+                lb: 2.20462,
+                t: 0.001
+            },
+            volume: {
+                m3: 1,
+                l: 1000,
+                ml: 1000000,
+                gal: 264.172
+            },
+            speed: {
+                'ms': 1,
+                'kmh': 3.6,
+                'mph': 2.23694
+            }
+        };
+
+        function convertValue() {
+            const value = parseFloat(document.getElementById('converterValue').value);
+            const type = document.getElementById('converterType').value;
+            const from = document.getElementById('fromUnit').value;
+            const to = document.getElementById('toUnit').value;
+
+            if (isNaN(value)) {
+                document.getElementById('converterResult').textContent = '0';
+                return;
+            }
+
+            const baseValue = value / conversions[type][from];
+            const result = baseValue * conversions[type][to];
+
+            document.getElementById('converterResult').textContent = 
+                result.toFixed(6).replace(/\.?0+$/, '') + ' ' + to;
+        }
+
+        // Periodická tabulka
+        const elements = [
+            {num: 1, symbol: 'H', name: 'Vodík', mass: 1.008},
+            {num: 2, symbol: 'He', name: 'Helium', mass: 4.003},
+            {num: 3, symbol: 'Li', name: 'Lithium', mass: 6.941},
+            {num: 4, symbol: 'Be', name: 'Beryllium', mass: 9.012},
+            {num: 5, symbol: 'B', name: 'Bor', mass: 10.811},
+            {num: 6, symbol: 'C', name: 'Uhlík', mass: 12.011},
+            {num: 7, symbol: 'N', name: 'Dusík', mass: 14.007},
+            {num: 8, symbol: 'O', name: 'Kyslík', mass: 15.999},
+            {num: 9, symbol: 'F', name: 'Fluor', mass: 18.998},
+            {num: 10, symbol: 'Ne', name: 'Neon', mass: 20.180},
+            {num: 11, symbol: 'Na', name: 'Sodík', mass: 22.990},
+            {num: 12, symbol: 'Mg', name: 'Hořčík', mass: 24.305},
+            {num: 13, symbol: 'Al', name: 'Hliník', mass: 26.982},
+            {num: 14, symbol: 'Si', name: 'Křemík', mass: 28.086},
+            {num: 15, symbol: 'P', name: 'Fosfor', mass: 30.974},
+            {num: 16, symbol: 'S', name: 'Síra', mass: 32.065},
+            {num: 17, symbol: 'Cl', name: 'Chlor', mass: 35.453},
+            {num: 18, symbol: 'Ar', name: 'Argon', mass: 39.948},
+            {num: 26, symbol: 'Fe', name: 'Železo', mass: 55.845},
+            {num: 29, symbol: 'Cu', name: 'Měď', mass: 63.546},
+            {num: 30, symbol: 'Zn', name: 'Zinek', mass: 65.380},
+            {num: 47, symbol: 'Ag', name: 'Stříbro', mass: 107.868},
+            {num: 79, symbol: 'Au', name: 'Zlato', mass: 196.967},
+            {num: 82, symbol: 'Pb', name: 'Olovo', mass: 207.200},
+            {num: 92, symbol: 'U', name: 'Uran', mass: 238.029}
+        ];
+
+        function loadPeriodicTable() {
+            const grid = document.getElementById('periodicGrid');
+            grid.innerHTML = '';
+
+            elements.forEach(el => {
+                const div = document.createElement('div');
+                div.className =
